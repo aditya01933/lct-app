@@ -24,6 +24,9 @@ class UserLocationsController < ApplicationController
   # POST /user_locations or /user_locations.json
   def create
     @user_location = UserLocation.new(user_location_params)
+    puts "--------------------->"
+    puts user_location_params
+    puts "--------------------->"
 
     respond_to do |format|
       if @user_location.save
