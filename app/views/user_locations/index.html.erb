@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Permission Required</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    p {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Location Permission</h1>
+
+    <script>
+      function getLocation() {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+
+              const data = {
+                lat: latitude,
+                long: longitude
+              };
+
+              fetch("/user_locations.json", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+              })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+                  return response.json();
+                })
+                .then(responseData => {
+                  console.log("POST request successful:", responseData);
+                })
+                .catch(error => {
+                  console.error("Error making POST request:", error);
+                });
+            },
+            function (error) {
+              switch (error.code) {
+                case error.PERMISSION_DENIED:
+                  console.error("User denied the request for Geolocation. Please provide location permission.");
+                  break;
+                case error.POSITION_UNAVAILABLE:
+                  console.error("Location information is unavailable.");
+                  break;
+                case error.TIMEOUT:
+                  console.error("The request to get user location timed out.");
+                  break;
+                case error.UNKNOWN_ERROR:
+                  console.error("An unknown error occurred.");
+                  break;
+              }
+            }
+          );
+        } else {
+          console.error("Geolocation is not supported by this browser.");
+        }
+      }
+
+      // Call the function on page load
+      window.onload = getLocation;
+    </script>
+
+    <p>Please provide location permission by to move forward by going to Chrome > Settings > Site settings > Location</p>
+  </div>
+
+</body>
+</html>
